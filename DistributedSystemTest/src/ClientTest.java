@@ -24,8 +24,8 @@ public class ClientTest extends Recipient implements iClient, Runnable
 	private static Map<Integer, Long> serverToClientRegister;
 	private static int totalClients = 30;
 	static long clientSleepTime = 200;
-	static long serverSleepTime = 600;
-	static long testSleepTime = 2000;
+	static long serverSleepTime = 500;
+	static long testSleepTime = 5000;
 	static long timeoutThreshold = 10000;
 	private int lastIntGenerated;
 	
@@ -140,6 +140,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 	{
 		iConstants testConstants = new TestConstants();
 		portal = new Client(this, testConstants);
+		engine = (EngineInterface) portal.makeNewConnection("TestEngine");
 		this.iAm = iAm;
 	}
 	
@@ -153,7 +154,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 	@Override
 	public void run() 
 	{
-		engine = (EngineInterface) portal.makeNewConnection("TestEngine");
+		
 		
 		while(true)
 		{
@@ -163,7 +164,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 			if(myId != null)
 			{	
 				int testString = engine.dummyEngineString(myId);		
-				//System.out.println("Client " + iAm + " got a test string from the engine: " + testString);
+				//A.error("Client " + iAm + " got a test string from the engine: " + testString);
 				
 				if(testString != lastIntGenerated)
 					A.fatalError("Client " + iAm + " failed to receive a matching test int from the server.");
@@ -180,8 +181,8 @@ public class ClientTest extends Recipient implements iClient, Runnable
 			} 
 			catch (InterruptedException e) 
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//System.out.println("Client thread was interrupted.");
+				//e.printStackTrace();
 			}
 		}
 		
@@ -223,7 +224,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 	@Override
 	public void setClientId(int id)
 	{
-		//System.out.println("Set the clientId to: " + id);
+		System.out.println("Set the clientId to: " + id);
 		this.myId = id;	
 	}
 }

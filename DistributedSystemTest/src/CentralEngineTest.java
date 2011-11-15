@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rpc.AnnotatedObject;
@@ -12,7 +13,7 @@ import communication.iPortal;
 
 public class CentralEngineTest extends Recipient implements iEngine, Runnable
 {
-	private Map<Integer, iClient> connectedClients;
+	private List<iClient> connectedClients;
 	private ArrayList<Integer> clientList;
 	private iPortal portal;
 	private int nextClientId;
@@ -28,7 +29,7 @@ public class CentralEngineTest extends Recipient implements iEngine, Runnable
 	{
 		TestConstants constants = new TestConstants();
 		portal = new Server(this, 10002, constants);	
-		connectedClients = new HashMap<Integer, iClient>();
+		connectedClients = new ArrayList<iClient>();
 		clientList = new ArrayList<Integer>();
 		nextClientId = 0;
 	}
@@ -39,20 +40,19 @@ public class CentralEngineTest extends Recipient implements iEngine, Runnable
 		//System.out.println("Starting central engine run loop.");
 		
 		while(true)
-		{
-			A.error("In the central engine loop");
+		{			
+			long currentTime = System.currentTimeMillis();
 			
-			synchronized(connectedClients)
+			int broadcasts = 0;
+			
+			for(int i = 0; i < connectedClients.size(); i++)
 			{
-				for (Integer connectedClientId : connectedClients.keySet()) 
-				{
-					// int connectedClientId = clientList.get(0);
-
-					iClient connectedClient = connectedClients.get(connectedClientId);
-
-					connectedClient.receiveUpdateFromMaster("The current time on the central engine is: " + System.currentTimeMillis());
-				}
+				iClient client = connectedClients.get(i);
+				client.receiveUpdateFromMaster("Current time is: " + currentTime);
+				broadcasts++;
 			}
+			
+			A.error("Broadcast " + broadcasts + " updates to clients.");
 			
 			try
 			{
@@ -87,11 +87,8 @@ public class CentralEngineTest extends Recipient implements iEngine, Runnable
 			
 			int id = nextClientId++;
 			newClient.setClientId(id);
-			
-			synchronized(connectedClients)
-			{	
-				connectedClients.put(id, newClient);	
-			}	
+						
+			connectedClients.add(newClient);		
 		}
 	}
 
