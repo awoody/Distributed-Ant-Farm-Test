@@ -1,7 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 
 import rpc.AnnotatedObject;
 import utilities.A;
@@ -31,10 +33,10 @@ public class ClientTest extends Recipient implements iClient, Runnable
 	
 	public static void main(String [] args)
 	{		
-		clientToServerRegister = new HashMap<Integer, Long>();
-		serverToClientRegister = new HashMap<Integer, Long>();
+		clientToServerRegister = new ConcurrentHashMap<Integer, Long>();
+		serverToClientRegister = new ConcurrentHashMap<Integer, Long>();
 		
-		long now = System.currentTimeMillis() + 5000;
+		long now = System.currentTimeMillis() + 35000;
 				
 		for(int i=0; i < totalClients; i++)
 		{
@@ -89,7 +91,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 				
 				if(currentTime - lastCtoSComm >= timeoutThreshold)
 				{
-					A.error("Client " + i + " has not heard back from the server in: " + (currentTime - lastCtoSComm) + " miliseconds.");
+					A.log("Client " + i + " has not heard back from the server in: " + (currentTime - lastCtoSComm) + " miliseconds.");
 					isBroken = true;
 				}
 				
@@ -104,7 +106,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 				
 				if(currentTime - lastStoCComm >= timeoutThreshold)
 				{
-					A.error("The server has not broadcast to client: " + i + " in " + (currentTime - lastStoCComm) + " miliseconds.");
+					A.log("The server has not broadcast to client: " + i + " in " + (currentTime - lastStoCComm) + " miliseconds.");
 					isBroken = true;
 				}
 				
@@ -120,7 +122,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 			double CtoSvar = A.standardDeviation(clientToServerLag, averageCtoS);
 			double StoCvar = A.standardDeviation(serverToClientLag, averageStoC);
 			
-			A.error("Client passed assertion tests normally");
+			//A.log("Client passed assertion tests normally");
 //			A.error("Average StoC lag: " + averageStoC + " and variance: " + StoCvar);
 //			A.error("Average CtoS lag: " + averageCtoS + " and variance: " + CtoSvar);
 //			System.out.println();
@@ -140,7 +142,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 	{
 		iConstants testConstants = new TestConstants();
 		portal = new Client(this, testConstants);
-		engine = (EngineInterface) portal.makeNewConnection("TestEngine");
+		engine = (EngineInterface) portal.makeNewConnectionToResource("TestEngine");
 		this.iAm = iAm;
 	}
 	
@@ -181,7 +183,7 @@ public class ClientTest extends Recipient implements iClient, Runnable
 			} 
 			catch (InterruptedException e) 
 			{
-				//System.out.println("Client thread was interrupted.");
+				A.log("Client thread was interrupted.");
 				//e.printStackTrace();
 			}
 		}

@@ -41,10 +41,10 @@ public class TestConstants implements iConstants
 	}
 
 	@Override
-	public NodeId getDistributorNodeId()
+	public boolean shutdownOnSocketError() 
 	{
 		// TODO Auto-generated method stub
-		return new NodeId(0,0);
+		return true;
 	}
 	
 }
